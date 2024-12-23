@@ -53,7 +53,7 @@ h1 {
   text-align: center;
 }
 
-input[type="text"] {
+input[type='text'] {
   width: 100%;
   padding: 10px;
   margin-bottom: 10px;
@@ -62,7 +62,7 @@ input[type="text"] {
 }
 
 button {
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   padding: 10px 15px;
   border: none;
@@ -96,4 +96,8 @@ li {
 
 .delete-btn:hover {
   background-color: #d32f2f;
+}
+
+.todo-text {
+  color: #000;
 }

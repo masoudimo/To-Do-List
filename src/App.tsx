@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import './App.css'
 
 interface Todo {
@@ -7,10 +7,16 @@ interface Todo {
 }
 
 const App: React.FC = () => {
-  const [todos, setTodos] = useState<Todo[]>([
-    { id: 1, text: 'Learn React' },
-    { id: 2, text: 'Build a Todo App' },
-  ])
+  const [todos, setTodos] = useState<Todo[]>(() => {
+    const savedTodos = localStorage.getItem('todo')
+    try {
+      return savedTodos ? JSON.parse(savedTodos) : []
+    } catch {
+      localStorage.removeItem('todo')
+      return []
+    }
+  })
+
   const [inputValue, setInputValue] = useState('')
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,6 +38,10 @@ const App: React.FC = () => {
     setTodos(todos.filter((todo) => todo.id !== id))
   }
 
+  useEffect(() => {
+    localStorage.setItem('todo', JSON.stringify(todos))
+  }, [todos])
+
   return (
     <div className="App">
       <h1>UU Todo App</h1>
@@ -52,7 +62,7 @@ const App: React.FC = () => {
       </div>
       <ul>
         {todos.map((todo) => (
-          <li key={todo.id}>
+          <li key={todo.id} style={{ color: '#000' }}>
             <span>{todo.text}</span>
             <button
               className="delete-btn"

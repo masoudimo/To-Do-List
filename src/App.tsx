@@ -1,20 +1,27 @@
 import React, { useState } from 'react'
 import './App.css'
+import { usePersistTodoList } from './hooks/usePersistTodoList'
 
-interface Todo {
+export interface Todo {
   id: number
   text: string
 }
 
 const App: React.FC = () => {
-  const [todos, setTodos] = useState<Todo[]>([
+  const [inputValue, setInputValue] = useState('')
+  const { todos, setTodos } = usePersistTodoList([
     { id: 1, text: 'Learn React' },
     { id: 2, text: 'Build a Todo App' },
   ])
-  const [inputValue, setInputValue] = useState('')
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value)
+  }
+
+  const handleSendToLocalStorage = (todoList: Todo[]) => {
+    setTimeout(() => {
+      localStorage.setItem('todoList', JSON.stringify(todoList))
+    }, 3000)
   }
 
   const handleAddTodo = () => {
@@ -23,13 +30,17 @@ const App: React.FC = () => {
         id: Date.now(),
         text: inputValue.trim(),
       }
-      setTodos([...todos, newTodo])
+      const newTodoList = [...todos, newTodo]
+      setTodos(newTodoList)
+      handleSendToLocalStorage(newTodoList)
       setInputValue('')
     }
   }
 
   const handleDeleteTodo = (id: number) => {
-    setTodos(todos.filter((todo) => todo.id !== id))
+    const newTodoList = todos.filter((todo) => todo.id !== id)
+    setTodos(newTodoList)
+    handleSendToLocalStorage(newTodoList)
   }
 
   return (
@@ -52,7 +63,7 @@ const App: React.FC = () => {
       </div>
       <ul>
         {todos.map((todo) => (
-          <li key={todo.id}>
+          <li key={todo.id} style={{ backgroundColor: 'red', color: 'white' }}>
             <span>{todo.text}</span>
             <button
               className="delete-btn"

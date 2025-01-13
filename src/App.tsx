@@ -6,7 +6,7 @@ import useLocalStorageHandler from './hooks/useLocalStorageHandler'
 const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[] | []>([])
   const { add, read } = useLocalStorageHandler()
-  const [inputValue, setInputValue] = useState('')
+  const [inputValue, setInputValue] = useState('') 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value)

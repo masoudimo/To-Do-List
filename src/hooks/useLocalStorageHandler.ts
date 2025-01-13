@@ -1,44 +1,42 @@
 import { Todo } from '../types/types'
 
-const useLocalStorageHandler = (val: Todo | Todo[] | String) => {
-  const add = (val: Todo | Todo[]) => {
-    return new Promise((resolve) => {
+type promiseType = {
+  status: 'ok'
+  data?: Todo[]
+}
+
+const useLocalStorageHandler = () => {
+  const add = (val: Todo[], clear: Boolean) => {
+    return new Promise<promiseType>((resolve) => {
       setTimeout(() => {
-        if (Array.isArray(val)) {
+        if (clear) {
           localStorage.clear()
-          val.map((v) => {
-            localStorage.setItem(String(v.id), v.text)
-          })
-        } else {
-          localStorage.setItem(String(val.id), val.text)
         }
-      }, 3000)
-      resolve({ status: 'ok' })
-    })
-  }
-  const remove = (val: Todo) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        localStorage.removeItem(String(val.id))
+        val.map((v) => {
+          localStorage.setItem(String(v.id), v.text)
+        })
       }, 3000)
       resolve({ status: 'ok' })
     })
   }
 
   const read = () => {
-    return new Promise((resolve) => {
+    return new Promise<promiseType>((resolve) => {
       setTimeout(() => {
         const localStorageLength = localStorage.length
         let todos = []
         for (let i = 0; i < localStorageLength; i++) {
-          todos.push(localStorage.key(i))
+          todos.push({
+            id: Number(localStorage.key(i)),
+            text: String(localStorage.getItem(String(localStorage.key(i)))),
+          })
         }
         resolve({ status: 'ok', data: todos })
       }, 3000)
     })
   }
 
-  return [add, remove, read]
+  return { add, read }
 }
 
 export default useLocalStorageHandler

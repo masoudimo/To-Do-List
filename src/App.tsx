@@ -1,17 +1,33 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import './App.css'
+import { Todo } from './types/todo'
+import debounce from './utils/debounce'
 
-interface Todo {
-  id: number
-  text: string
-}
 
 const App: React.FC = () => {
-  const [todos, setTodos] = useState<Todo[]>([
-    { id: 1, text: 'Learn React' },
-    { id: 2, text: 'Build a Todo App' },
-  ])
+  const [todos, setTodos] = useState<Todo[]>([])
   const [inputValue, setInputValue] = useState('')
+
+  const saveToLocalStorage = debounce((todos: Todo[]) => {
+    todos.forEach((todo) => {
+      localStorage.setItem(`todo_${todo.id}`, todo.text)
+    })
+  }, 3000)
+
+  useEffect(() => {
+    const savedTodos: Todo[] = Object.keys(localStorage)
+      .filter((key) => key.startsWith('todo_'))
+      .map((key) => {
+        const id = parseInt(key.replace('todo_', ''), 10)
+        const text = localStorage.getItem(key) || ''
+        return { id, text }
+      })
+    setTodos(savedTodos)
+  }, [])
+
+  useEffect(() => {
+    saveToLocalStorage(todos)
+  }, [todos, saveToLocalStorage])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value)
@@ -30,6 +46,7 @@ const App: React.FC = () => {
 
   const handleDeleteTodo = (id: number) => {
     setTodos(todos.filter((todo) => todo.id !== id))
+    localStorage.removeItem(`todo_${id}`) 
   }
 
   return (
@@ -67,4 +84,4 @@ const App: React.FC = () => {
   )
 }
 
-export default App
+export default App;

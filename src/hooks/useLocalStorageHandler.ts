@@ -1,9 +1,10 @@
 import { Todo } from '../types/types'
 
-const useLocalStorageHandler = (val: Todo | Todo[]) => {
+const useLocalStorageHandler = (val: Todo | Todo[] | String) => {
   const add = (val: Todo | Todo[]) => {
     setTimeout(() => {
       if (Array.isArray(val)) {
+        localStorage.clear()
         val.map((v) => {
           localStorage.setItem(String(v.id), v.text)
         })

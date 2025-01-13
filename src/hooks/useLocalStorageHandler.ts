@@ -1,6 +1,6 @@
 import { Todo } from '../types/types'
 
-export const useAddToLocalStorage = (val: Todo | Todo[]) => {
+const useALocalStorageHandler = (val: Todo | Todo[]) => {
   const add = (val: Todo | Todo[]) => {
     setTimeout(() => {
       if (Array.isArray(val)) {
@@ -12,6 +12,8 @@ export const useAddToLocalStorage = (val: Todo | Todo[]) => {
       }
     }, 3000)
   }
+  
+  
 }
 
-
+export default useLocalStorageHandler

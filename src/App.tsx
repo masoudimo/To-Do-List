@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import './App.css'
 
 interface Todo {
@@ -7,15 +7,25 @@ interface Todo {
 }
 
 const App: React.FC = () => {
-  const [todos, setTodos] = useState<Todo[]>([
-    { id: 1, text: 'Learn React' },
-    { id: 2, text: 'Build a Todo App' },
-  ])
+  const [todos, setTodos] = useState<Todo[]>([])
   const [inputValue, setInputValue] = useState('')
+
+
+  useEffect(() => {
+    const storedTodos = JSON.parse(localStorage.getItem("todos") || "[]");
+    setTodos(storedTodos);
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value)
   }
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    debugger;
+    if (e.key === 'Enter') {
+      handleAddTodo();
+    }
+  };
 
   const handleAddTodo = () => {
     if (inputValue.trim() !== '') {
@@ -24,13 +34,24 @@ const App: React.FC = () => {
         text: inputValue.trim(),
       }
       setTodos([...todos, newTodo])
-      setInputValue('')
+      setInputValue('');
+      setOnLocalStorage(newTodo)
     }
   }
 
-  const handleDeleteTodo = (id: number) => {
-    setTodos(todos.filter((todo) => todo.id !== id))
+  const setOnLocalStorage = (newTodo: Todo) => {
+    const localStorageData = JSON.parse(localStorage.getItem("todos") || "[]");
+    localStorageData.push(newTodo);
+    localStorage.setItem("todos", JSON.stringify(localStorageData));
   }
+
+  const handleDeleteTodo = (id: number) => {
+    const localStorageData = JSON.parse(localStorage.getItem("todos") || "[]");
+    const updatedLocalStorage = localStorageData.filter((todo: Todo) => todo.id !== id);
+    localStorage.setItem("todos", JSON.stringify(updatedLocalStorage));
+    setTodos(updatedLocalStorage);
+  }
+
 
   return (
     <div className="App">
@@ -42,6 +63,8 @@ const App: React.FC = () => {
           placeholder="Add a new todo..."
           value={inputValue}
           onChange={handleInputChange}
+          onKeyDown={handleKeyPress}
+
         />
         <button
           onClick={handleAddTodo}

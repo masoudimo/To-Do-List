@@ -86,6 +86,7 @@ li {
   margin-bottom: 10px;
   padding: 10px;
   display: flex;
+  color: #333;
   justify-content: space-between;
   align-items: center;
 }

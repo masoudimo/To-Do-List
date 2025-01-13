@@ -1,12 +1,14 @@
 import React, { useState } from 'react'
 import './App.css'
 import { Todo } from './types/types'
+import useLocalStorageHandler from './hooks/useLocalStorageHandler'
 
 const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([
     { id: 1, text: 'Learn React' },
     { id: 2, text: 'Build a Todo App' },
   ])
+  const [add, remove] = useLocalStorageHandler('')
   const [inputValue, setInputValue] = useState('')
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -20,12 +22,14 @@ const App: React.FC = () => {
         text: inputValue.trim(),
       }
       setTodos([...todos, newTodo])
+      add(todos)
       setInputValue('')
     }
   }
 
   const handleDeleteTodo = (id: number) => {
     setTodos(todos.filter((todo) => todo.id !== id))
+    remove(todos.find((todo) => todo.id === id))
   }
 
   return (

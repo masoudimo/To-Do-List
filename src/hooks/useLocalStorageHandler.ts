@@ -19,7 +19,20 @@ const useLocalStorageHandler = (val: Todo | Todo[] | String) => {
     }, 3000)
   }
 
-  return [add, remove]
+  const read = () => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const localStorageLength = localStorage.length
+        let todos = []
+        for (let i = 0; i < localStorageLength; i++) {
+          todos.push(localStorage.key(i))
+        }
+        resolve(todos)
+      }, 3000)
+    })
+  }
+
+  return [add, remove, read]
 }
 
 export default useLocalStorageHandler

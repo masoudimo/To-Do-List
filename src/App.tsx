@@ -1,10 +1,6 @@
 import React, { useState } from 'react'
 import './App.css'
-
-interface Todo {
-  id: number
-  text: string
-}
+import { Todo } from './types/types'
 
 const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([

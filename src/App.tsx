@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import './App.css'
 
 interface Todo {
@@ -6,15 +6,37 @@ interface Todo {
   text: string
 }
 
+const KEY_LOCAL_STORAGE = 'todo_test'
+
+const getTodoFromLocalStorage = () => {
+  const todoList = localStorage.getItem(KEY_LOCAL_STORAGE)
+  if (todoList) return JSON.parse(todoList || '[]') as Todo[]
+  return []
+}
+
+const setTodoListOnStorage = (todo: Todo[]) => {
+  localStorage.setItem(KEY_LOCAL_STORAGE, JSON.stringify(todo))
+}
+
 const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([
-    { id: 1, text: 'Learn React' },
-    { id: 2, text: 'Build a Todo App' },
+    // { id: 1, text: 'Learn React' },
+    // { id: 2, text: 'Build a Todo App' },
   ])
   const [inputValue, setInputValue] = useState('')
 
+  useEffect(() => {
+    setTodos(getTodoFromLocalStorage())
+  }, [])
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value)
+  }
+
+  const handleSetOnLocalStorage = (todoList: Todo[]) => {
+    setTimeout(() => {
+      setTodoListOnStorage(todoList)
+    }, 3000)
   }
 
   const handleAddTodo = () => {
@@ -23,13 +45,17 @@ const App: React.FC = () => {
         id: Date.now(),
         text: inputValue.trim(),
       }
-      setTodos([...todos, newTodo])
+      const newList = [...todos, newTodo]
+      setTodos(newList)
+      handleSetOnLocalStorage(newList)
       setInputValue('')
     }
   }
 
   const handleDeleteTodo = (id: number) => {
-    setTodos(todos.filter((todo) => todo.id !== id))
+    const newList = todos.filter((todo) => todo.id !== id)
+    setTodos(newList)
+    handleSetOnLocalStorage(newList)
   }
 
   return (

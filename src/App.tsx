@@ -1,17 +1,13 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import './App.css'
-
-interface Todo {
-  id: number
-  text: string
-}
+import { Todo } from './core/types/todos'
+import { vanillaDebounce } from './core/utils/vanilaDebounce'
+import { getToDosFrLS, setToDosInLS } from './core/utils/localStorage/todos'
 
 const App: React.FC = () => {
-  const [todos, setTodos] = useState<Todo[]>([
-    { id: 1, text: 'Learn React' },
-    { id: 2, text: 'Build a Todo App' },
-  ])
+  const [todos, setTodos] = useState<Todo[]>([])
   const [inputValue, setInputValue] = useState('')
+  const [mounting, setMounting] = useState(true)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value)
@@ -31,6 +27,26 @@ const App: React.FC = () => {
   const handleDeleteTodo = (id: number) => {
     setTodos(todos.filter((todo) => todo.id !== id))
   }
+
+  const debounceSetStorage = vanillaDebounce(setToDosInLS, 3000)
+  //for first initial
+  const getDataFromLocalStorage = () => {
+    const data = getToDosFrLS()
+    console.log('test', data)
+
+    if (data) {
+      setTodos(data)
+    }
+    if (mounting) {
+      setMounting(false)
+    }
+  }
+  useEffect(getDataFromLocalStorage, [mounting])
+
+  //  for any changes to sync
+  useEffect(() => {
+    if (todos && !mounting) debounceSetStorage(todos)
+  }, [todos, debounceSetStorage, mounting])
 
   return (
     <div className="App">
@@ -53,7 +69,7 @@ const App: React.FC = () => {
       <ul>
         {todos.map((todo) => (
           <li key={todo.id}>
-            <span>{todo.text}</span>
+            <span style={{ color: 'black' }}>{todo.text}</span>
             <button
               className="delete-btn"
               onClick={() => handleDeleteTodo(todo.id)}

@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
-import './App.css'
+import type React from 'react'
+import { useState } from 'react'
+import useLocalStorage from './utlis/useLocalStorage'
 
 interface Todo {
   id: number
@@ -7,10 +8,11 @@ interface Todo {
 }
 
 const App: React.FC = () => {
-  const [todos, setTodos] = useState<Todo[]>([
+  const [todos, setTodos] = useLocalStorage<Todo[]>('todos', [
     { id: 1, text: 'Learn React' },
     { id: 2, text: 'Build a Todo App' },
   ])
+
   const [inputValue, setInputValue] = useState('')
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,6 +46,7 @@ const App: React.FC = () => {
           onChange={handleInputChange}
         />
         <button
+          type="button"
           onClick={handleAddTodo}
           style={{ backgroundColor: '#007bff', color: 'white' }}
         >
@@ -55,6 +58,7 @@ const App: React.FC = () => {
           <li key={todo.id}>
             <span>{todo.text}</span>
             <button
+              type="button"
               className="delete-btn"
               onClick={() => handleDeleteTodo(todo.id)}
             >

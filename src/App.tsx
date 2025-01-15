@@ -1,17 +1,29 @@
-import React, { useState } from 'react'
+import type React from 'react'
+import { useEffect, useState } from 'react'
+import useDebounce from './utils/useDebounce' 
 import './App.css'
-
-interface Todo {
-  id: number
-  text: string
-}
+import { defaultTodos } from './data/initialvalues'
+import type { Todo } from './types/todo.types'
 
 const App: React.FC = () => {
-  const [todos, setTodos] = useState<Todo[]>([
-    { id: 1, text: 'Learn React' },
-    { id: 2, text: 'Build a Todo App' },
-  ])
+  const storedTodos = localStorage.getItem('todos')
+  const initialTodos: Todo[] = (() => {
+    try {
+      return storedTodos ? JSON.parse(storedTodos) : defaultTodos
+    } catch (error) {
+      console.error('Error parsing todos from localStorage:', error)
+      return defaultTodos
+    }
+  })()
+
+  const [todos, setTodos] = useState<Todo[]>(initialTodos)
   const [inputValue, setInputValue] = useState('')
+
+  const debouncedTodos = useDebounce(todos, 3000, initialTodos)
+
+  useEffect(() => {
+    localStorage.setItem('todos', JSON.stringify(debouncedTodos))
+  }, [debouncedTodos])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value)
@@ -23,13 +35,13 @@ const App: React.FC = () => {
         id: Date.now(),
         text: inputValue.trim(),
       }
-      setTodos([...todos, newTodo])
+      setTodos((prevTodos) => [...prevTodos, newTodo])
       setInputValue('')
     }
   }
 
   const handleDeleteTodo = (id: number) => {
-    setTodos(todos.filter((todo) => todo.id !== id))
+    setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id))
   }
 
   return (
@@ -44,6 +56,7 @@ const App: React.FC = () => {
           onChange={handleInputChange}
         />
         <button
+          type="button"
           onClick={handleAddTodo}
           style={{ backgroundColor: '#007bff', color: 'white' }}
         >
@@ -55,6 +68,7 @@ const App: React.FC = () => {
           <li key={todo.id}>
             <span>{todo.text}</span>
             <button
+              type="button"
               className="delete-btn"
               onClick={() => handleDeleteTodo(todo.id)}
             >
